@@ -1,8 +1,32 @@
----
-ApiGatewayAccount:
-  Type: AWS::ApiGateway::Account
-  Properties:
-    CloudWatchRoleArn:
-      Fn::GetAtt:
-      - ApiGatewayCloudWatchLogsRole
-      - Arn
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  StageName:
+    Type: String
+  RestApiName:
+    Type: String
+Resources:
+  MyApigateway:
+    Type: "AWS::ApiGateway::Account"
+    Properties:
+      CloudWatchRoleArn: arn:aws:iam::839757855400:role/aws-service-role/ops.apigateway.amazonaws.com/AWSServiceRoleForAPIGateway
+  MyApistage:
+    Type: "AWS::ApiGateway::Stage"
+    Properties:
+      StageName: !Ref StageName
+      RestApiId: !Ref MyRestApi
+  MyRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Ref RestApiName
+  MyResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt MyRestApi.RootResourceId
+      PathPart: test1
+      RestApiId: !Ref RestApiName
+  MyResource2:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt MyResource.ResourceId
+      PathPart: sub-test
+      RestApiId: !Ref RestApiName
